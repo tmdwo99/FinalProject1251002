@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head th:replace="fragments/config :: configFragment"> </head>
+		
+	<body class="hold-transition skin-blue layout-top-nav">
+		<div class="wrapper">
+	
+		<header th:replace="fragments/header :: naviFragment"></header>
+	
+			<div class="content-wrapper">
+				<div class="container">
+					<section class="content-header">
+						<h1>General Form Elements <small>Top Navigation</small></h1>
+						<ol class="breadcrumb">
+							<li><a href="#"><i class="fa fa-dashboard"></i>Home</a></li>
+							<li><a href="#">Board</a></li>
+							<li class="active">List All Page</li>
+						</ol>
+					</section>
+					
+					<section class="content">
+						<div class="box">
+							<div class="box-header with-border">
+								<h3 class="box-title">Board List Page</h3>
+								<button id="regBtn" type="button" class="btn btn-default pull-right">
+									Register New Board
+								</button>
+							</div>
+							<div class="box-body">
+								<table class="table table-bordered table-hover">
+									<tr>
+										<th style="width:10px">#</th>
+										<th>Title</th><th>Writer</th><th>Registered Date</th>
+										<th>Update Date</th>
+									</tr>
+									<tr th:each="board:${list}">
+										<td><a th:href="@{'/board/read?bno='+${board.bno}}" th:text="${board.bno}"></a></td>
+										<td><a class="move" th:href="${board.bno}" th:text="${board.title}"></a></td>
+										<td th:text="${board.writer}"></td>
+										<td th:text="${#dates.format(board.regdate, 'yyyy-MM-dd HH:mm')}"></td>
+										<td th:text="${#dates.format(board.updateData, 'yyyy-MM-dd HH:mm')}"></td>
+									</tr>
+								</table>
+								<div class="text-center">
+									<ul class="pagination" th:if="${pageMaker.endPage gt 1}">
+										<li th:if="${pageMaker.prev}">
+											<a th:href="${pageMaker.startPage-1}">&laquo;</a>
+										</li>
+										<li th:classappend="${i eq pageMaker.getCri().getPageNum()}? 'active'"
+											th:each="i : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage, 1)}">
+											<a class="page-link" th:href="${i}" th:text="${i}"></a>
+										</li>
+										<li th:if="${pageMaker.next and pageMaker.endPage gt 0}">
+											<a th:href="${pageMaker.endPage+1}">&raquo;</a>
+										</li>	
+									</ul>
+								</div>
+								<div class="modal fade" id="resultModal">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<button type="button" class="close" 
+														data-dismiss="modal"
+														aria-hidden="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+												<h4 class="modal-title">Board Info</h4>
+											</div>
+											<div class="modal-body">
+												<p>처리가 완료되었습니다.</p>
+											</div><div class="modal-footer">
+												<button type="button" class="btn btn-default"
+														data-dismiss="modal">Close</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<form id="actionForm" action="/board/list" method="get">
+										<input type="hidden" name="pageNum" th:value="${pageMaker.cri.pageNum}">
+										<input type="hidden" name="amount" th:value="${pageMaker.cri.amount}">
+										<input type="hidden" name="type" th:value="${pageMaker.cri.type}">
+										<input type="hidden" name="keyword" th:value="${pageMaker.cri.keyword}">	
+								</form>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+			
+		</div>
+			<footer th:replace="fragments/footer :: scriptsFragment"></footer>
+			<script type="text/javascript">
+				$(document).ready(function(){
+					var result = "[[${result}]]";
+					console.log("result" + result);
+					checkModal(result);
+					
+					history.replaceState({}, null, null);
+					function checkModal(result) {
+						if(result == '' || history.state){
+							return;
+						}
+						if(parseInt(result)>0){
+							$(".modal-body").html("게시글 " + parseInt(result)+"번이 등록되었습니다.");
+							$("#resultModal").modal("show");
+						}
+					}
+				
+					$("#regBtn").on("click", function(){
+						self.location = "/board/register";
+					});
+					
+					var actionForm = $("#actionForm");
+					
+					$(".pagination li a").on("click", function(e){
+						e.preventDefault();
+						console.log("click");
+						actionForm.find("input[name='pageNum']").val($(this).attr("href"));
+						actionForm.submit();
+					});
+					
+					$(".move").on("click", function(e){
+						e.preventDefault();
+						actionForm.append("<input type='hidden' name='bno' value='"+$(this).attr("href")+"'>");
+						actionForm.attr("action", "/board/read");
+						actionForm.submit();
+					});
+				});
+			</script>
+	</body>
+</html>
