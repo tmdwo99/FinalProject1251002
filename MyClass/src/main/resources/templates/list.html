@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head th:replace="fragments/config :: configFragment"> </head>
+	
+	<body class="hold-transition skin-blue layout-top-nav">
+		<div class="wrapper">
+			<header th:replace="fragments/header :: naviFragment"></header>
+			
+			<div class="content-wrapper">
+				<div class="container">
+					<section class="content-header">
+						<h1>General Form Elements <small>Top Navigation</small></h1>
+						<ol class="breadcrumb">
+							<li><a href="#"><i class="fa fa-dashboard"></i>Home</a></li>
+							<li><a href="#">Class</a></li>
+							<li class="active">List All Page</li>
+						</ol>
+					</section>
+					
+					<section class="content">
+						<div class="box">
+							<div class="box-header with-border">
+								<h3 class="box-title">Class List Page</h3>
+								<button id="regBtn" type="button"
+								        class="btn btn-default pull-right">
+									Register New Class
+								</button>
+							</div>
+							<div class="box-body">
+								<table class="table table-bordered table-hover">
+									<tr>
+										<th style="width:10px">#</th>
+										<th>학번</th><th>이름</th><th>사용pc번호</th><th>시작</th>
+										<th>종료</th><th>    </th>
+									</tr>
+									<tr th:each="cla:${list}">
+										<td><a th:href="@{'/read?bno='+${cla.bno}}"
+										       th:text="${cla.bno}"></a></td>
+										<td th:text="${cla.haknum}"></td>
+										<td th:text="${cla.hakname}"></td>
+										<td th:text="${cla.pcnum}"></td>
+										<td th:text="${#dates.format(cla.startDate, 'yyyy-MM-dd HH:mm')}"></td>
+										<td th:text="${#dates.format(cla.endDate, 'yyyy-MM-dd HH:mm')}"></td>
+										<td><a th:href="@{'/modify?bno='+${cla.bno}+'&pcnum='+${cla.pcnum}}"
+										       th:text="종료"></a></td>
+									</tr>
+								</table>
+								<div class="modal fade" id="resultModal">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<button type="button" class="close" 
+												        data-dismiss="modal"
+												        aria-hidden="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+												<h4 class="modal-title">Class Info</h4>
+											</div>
+											<div class="modal-body">
+												<p>처리가 완료되었습니다.</p>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-default"
+												        data-dismiss="modal">Close</button>
+											</div>
+										</div>
+									</div>
+								</div>
+										
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+			
+			<footer th:replace="fragments/footer :: footerFragment"></footer>
+		</div>
+		
+		<footer th:replace="fragments/footer :: scriptFragment"></footer>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var result = "[[${result}]]";
+				var resultRead = "[[${resultRead}]]";
+				checkModal(result);
+				checkModalRead(resultRead);
+				
+				history.replaceState({}, null, null);
+				function checkModal(result){
+					if(result == '' || history.state){
+						return;
+					}
+					if(parseInt(result) > 0){
+						$(".modal-body").html(
+								"게시글 " + parseInt(result) + "번이 등록되었습니다.");
+						$("#resultModal").modal("show");
+					}
+				}
+				
+				function checkModalRead(resultRead){
+					if(resultRead == '' || history.state){
+						return;
+					}
+					if(parseInt(resultRead) > 0){
+						$(".modal-body").html(
+								"사용 PC " + parseInt(resultRead) + "번이 종료되었습니다.");
+						$("#resultModal").modal("show");
+					}
+					if(parseInt(resultRead) == 0){
+						$(".modal-body").html(
+								"해당 PC는 이미 종료된 PC입니다.");
+						$("#resultModal").modal("show");
+					}
+				}
+				
+				$("#regBtn").on("click", function(){
+					self.location = "/register";
+				});
+				
+			});
+		</script>
+	</body>
+</html>
+
+
+
+
+

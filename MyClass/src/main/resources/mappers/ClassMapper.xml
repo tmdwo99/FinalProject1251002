@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="org.dsu.sj.mapper.ClassMapper">
+  
+  	<select id="getListWithPaging" 
+  			resultType="org.dsu.sj.domain.ClassVO">
+  		<![CDATA[
+  		SELECT bno, haknum, hakname, pcnum, startDate, endDate
+  		FROM tbl_class
+  		WHERE bno > 0
+  		ORDER BY bno DESC, endDate DESC
+  		LIMIT #{pageStart}, #{amount}
+  		]]>
+  	</select>
+  	
+  	<insert id="insertSelectKey" parameterType="org.dsu.sj.domain.ClassVO">
+  		INSERT INTO tbl_class (haknum, hakname, pcnum)
+  		VALUES (#{haknum}, #{hakname}, #{pcnum})
+  		<selectKey keyProperty="bno" resultType="long" order="AFTER">
+  			SELECT MAX(bno) FROM tbl_class;
+  		</selectKey>
+  	</insert>
+
+	<select id="read" resultType="org.dsu.sj.domain.ClassVO">
+  		SELECT * FROM tbl_class
+  		WHERE bno=#{bno}
+  	</select>
+  	
+  	<update id="update">
+  		UPDATE tbl_class
+  		SET endDate=now()
+  		WHERE bno=#{bno}
+  	</update>
+
+  </mapper>
